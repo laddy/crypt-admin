@@ -9,6 +9,7 @@
   "author": "YuyaTanaka",
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.15.1",
     "browserify": "^13.0.1",
     "crypt": "0.0.1",
     "ect": "^0.5.9",
