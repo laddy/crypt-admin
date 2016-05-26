@@ -6,9 +6,10 @@ var ECT        = require('ect');
 
 var crypt_salt = 'GYw-HB35AHsTVmKVyJ7Ur6JLhaQHPiWS';
 
-var app = express();
+var app     = express();
 var server  = app.listen(3000);
 
+app.use(bodyParser.urlencoded({extended: true}));
 app.engine('ect', ECT({ watch: true, root: __dirname + '/views', ext: '.ect' }).render);
 app.set('view engine', 'ect');
 
@@ -58,9 +59,26 @@ function decrypto_convert(text)
 
 // console.log(decrypto_convert(crypto_convert('test')));
 
+// ログイン画面表示
 app.get('/', function(req, res) {
-  res.render('index', {title1 : 'express test title1'});
+    res.render('index', {title1 : 'express test title1'});
 });
+app.post('/', function(req, res) {
+    console.log(req.body);
+    res.render('index', {title1 : 'post', hoge: req.body.test});
+});
+
+
+// ログイン後画面表示
+
+
+
+// ユーザ登録
+
+
+// サービス登録
+
+
 
 
 app.get('/test', function(req, res){
