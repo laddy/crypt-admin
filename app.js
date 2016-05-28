@@ -70,14 +70,21 @@ app.post('/', function(req, res) {
 
 
 // ログイン後画面表示
+app.get('/list', function(req, res) {
+    res.render('acclist');
 
+});
 
 
 // ユーザ登録
-
+app.get('/admin-user', function(req, res) {
+    res.render('admin-user');
+});
 
 // サービス登録
-
+app.get('/admin-service', function(req, res) {
+    res.render('admin-service');
+});
 
 
 
