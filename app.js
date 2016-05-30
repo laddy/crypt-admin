@@ -70,9 +70,14 @@ app.post('/', function(req, res) {
 
 
 // ログイン後画面表示
-app.get('/list', function(req, res) {
-    res.render('acclist');
-
+app.get('/acclist', function(req, res) {
+    res.render('acclist', {
+        service: [
+            { service: 'Google', url: 'https://google.co.jp/', id: '12345', pass: 'xxxxxxxx'},
+            { service: 'Facebook', url: 'https://facebook.com/', id: '12345', pass: 'yyyyy'},
+            { service: 'Twitter', url: 'https://twitter.com/', id: '12345', pass: 'zzzzz' }
+        ]
+    });
 });
 
 
