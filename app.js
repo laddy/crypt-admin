@@ -13,14 +13,21 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.engine('ect', ECT({ watch: true, root: __dirname + '/views', ext: '.ect' }).render);
 app.set('view engine', 'ect');
 
-console.log(crypto.createHash('sha256').update('hoge'+crypt_salt).digest('hex'));
+console.log(crypto.createHash('sha256').update('hogehoge'+crypt_salt).digest('hex'));
 
+mongodb.MongoClient.connect("mongodb://ds030829.mlab.com:30829/crypt-admin", function(err, database) {
+    users = database.collection("users");
+});
+
+users.find().toArray(function(err, items) {
+    console.log(items);
+});
 /*
-var db = new mongo.Db('crypt-admin', new mongo.Server('ds030829.mlab.com', 30829, {}), {});
 var Collection;
 db.open(function() {
     db.authenticate('laddy', 'laddymongo', function(err, result) {
         });
+    /*
     db.collection('teacherCollection', function(err, collection) {
         doc = {
             "firstname" : "Taro",
@@ -33,14 +40,13 @@ db.open(function() {
         });
 
     });
-    db.collection('teacherCollection').find();
+    db.collection('service').find();
     db.cursor.each(function(err, doc) {
         console.log(doc);
     });
     db.close();
 });
 */
-
 function crypto_convert(text)
 {
     var cipher  = crypto.createCipher('aes-256-cbc', 'password');
