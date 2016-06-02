@@ -9,20 +9,6 @@ var crypt_salt = 'GYw-HB35AHsTVmKVyJ7Ur6JLhaQHPiWS';
 var app     = express();
 var server  = app.listen(3000);
 
-app.use(bodyParser.urlencoded({extended: true}));
-app.engine('ect', ECT({ watch: true, root: __dirname + '/views', ext: '.ect' }).render);
-app.set('view engine', 'ect');
-
-console.log(crypto.createHash('sha256').update('hogehoge'+crypt_salt).digest('hex'));
-
-var service;
-var users;
-mongo.MongoClient.connect("mongodb://laddy:laddymongo@ds030829.mlab.com:30829/crypt-admin", function(err, database) {
-    users   = database.collection("users");
-    service = database.collection("service");
-
-});
-
 function crypto_convert(text)
 {
     var cipher  = crypto.createCipher('aes-256-cbc', 'password');
@@ -38,6 +24,20 @@ function decrypto_convert(text)
     dec      += decipher.final('utf-8');
     return dec;
 }
+
+app.use(bodyParser.urlencoded({extended: true}));
+app.engine('ect', ECT({ watch: true, root: __dirname + '/views', ext: '.ect' }).render);
+app.set('view engine', 'ect');
+
+console.log(crypto.createHash('sha256').update('hogehoge'+crypt_salt).digest('hex'));
+
+var service;
+var users;
+mongo.MongoClient.connect("mongodb://laddy:laddymongo@ds030829.mlab.com:30829/crypt-admin", function(err, database) {
+    users   = database.collection("users");
+    service = database.collection("service");
+});
+
 
 // console.log(decrypto_convert(crypto_convert('test')));
 
@@ -65,22 +65,22 @@ app.get('/admin-user', function(req, res) {
     res.render('admin-user');
 });
 
+
 // サービス登録
 app.get('/admin-service', function(req, res) {
-    res.render('admin-service');
     service.find().toArray(function(err, items) {
         console.log(items);
-        res.render('admin-service', items);
+        res.render('admin-service', {list: items});
     });
 });
 app.post('/admin-service', function(req, res) {
     console.log(res.body);
     // Save Mongo
     service.insert(req.body);
-    
-})
-
+    res.redirect('/admin-service');
+});
 app.get('/test', function(req, res){
 
 
 });
+
