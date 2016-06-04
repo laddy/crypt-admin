@@ -65,11 +65,12 @@ app.get('/admin-user', function(req, res) {
     res.render('admin-user');
 });
 
-
 // サービス登録
 app.get('/admin-service', function(req, res) {
+    console.log(req.query);
+    
     service.find().toArray(function(err, items) {
-        console.log(items);
+//        console.log(items);
         res.render('admin-service', {list: items});
     });
 });
@@ -79,8 +80,9 @@ app.post('/admin-service', function(req, res) {
     service.insert(req.body);
     res.redirect('/admin-service');
 });
+
+
 app.get('/test', function(req, res){
 
 
 });
-

@@ -57,7 +57,12 @@
     </tr>
     <% for item in @list : %>
     <tr>
-        <td><%- item._id %></td>
+        <td
+          data-_id="<%- item._id %>"
+          data-service="<%- item.service %>"
+          data-url="<%- item.url %>"
+          data-id="<%- item.id %>"
+          data-pass="<%- item.pass %>"><%- item._id %></td>
         <td><%- item.service %></td>
         <td><%- item.url %></td>
         <td><%- item.id %></td>
