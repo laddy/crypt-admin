@@ -66,11 +66,8 @@ app.get('/admin-user', function(req, res) {
 });
 
 // サービス登録
-app.get('/admin-service', function(req, res) {
-    console.log(req.query);
-    
+app.get('/admin-service/', function(req, res) {
     service.find().toArray(function(err, items) {
-//        console.log(items);
         res.render('admin-service', {list: items});
     });
 });
@@ -81,6 +78,21 @@ app.post('/admin-service', function(req, res) {
     res.redirect('/admin-service');
 });
 
+
+// Service Edit
+app.get("/admin-edit/:_id", function(req, res) {
+    service.findOne({_id: mongo.ObjectID(req.params._id)}, function(err, item) {
+        
+        console.log(item);
+        
+//        res.send(item);
+    });
+});
+
+app.get("/admin-edit/", function(req, res) {
+        console.log("aaaaaaaaaa");
+//        res.send(item);
+});
 
 app.get('/test', function(req, res){
 
