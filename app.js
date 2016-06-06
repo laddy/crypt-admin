@@ -41,6 +41,9 @@ mongo.MongoClient.connect("mongodb://laddy:laddymongo@ds030829.mlab.com:30829/cr
 
 // console.log(decrypto_convert(crypto_convert('test')));
 
+
+
+
 // ログイン画面表示
 app.get('/', function(req, res) {
     res.render('index', {title1 : 'express test title1'});
@@ -82,9 +85,7 @@ app.post('/admin-service', function(req, res) {
 // Service Edit
 app.get("/admin-edit/:_id", function(req, res) {
     service.findOne({_id: mongo.ObjectID(req.params._id)}, function(err, item) {
-        
         console.log(item);
-        
 //        res.send(item);
     });
 });
@@ -98,3 +99,6 @@ app.get('/test', function(req, res){
 
 
 });
+
+
+app.use(express.static('public'));

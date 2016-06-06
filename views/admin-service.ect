@@ -23,9 +23,9 @@
           data-pass="<%- item.pass %>">
           <a href="/admin-edit/<%- item._id %>">Edit</a></td>
         <td><%- item.service %></td>
-        <td><%- item.url %></td>
+        <td><a href="<%- item.url %>">Link</a></td>
         <td><%- item.id %></td>
-        <td><%- item.pass %></td>
+        <td class="hidden-pass" data-pass="<%- item.pass %>">*****</td>
     </tr>
     <% end %>
   </table>
