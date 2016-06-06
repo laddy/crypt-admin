@@ -57,7 +57,7 @@
     </tr>
     <% for item in @list : %>
     <tr>
-        <td><%- item._id %></td>
+        <td><input type="button" class="btn btn-default btn-xs" value="Edit" data-mongo="<%- item._id %>"></td>
         <td><%- item.service %></td>
         <td><%- item.url %></td>
         <td><%- item.id %></td>

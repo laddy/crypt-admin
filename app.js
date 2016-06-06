@@ -13,15 +13,15 @@ function crypto_convert(text)
 {
     var cipher  = crypto.createCipher('aes-256-cbc', 'password');
     var crypted = cipher.update(text, 'utf-8', 'hex');
-    crypted += cipher.final('hex');
+    crypted    += cipher.final('hex');
     return crypted;
 }
 
 function decrypto_convert(text)
 {
-    decipher  = crypto.createDecipher('aes-256-cbc', 'password');
-    dec       = decipher.update(text, 'hex', 'utf-8');
-    dec      += decipher.final('utf-8');
+    var decipher  = crypto.createDecipher('aes-256-cbc', 'password');
+    var dec       = decipher.update(text, 'hex', 'utf-8');
+    dec          += decipher.final('utf-8');
     return dec;
 }
 
