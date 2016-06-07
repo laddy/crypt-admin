@@ -29,7 +29,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.engine('ect', ECT({ watch: true, root: __dirname + '/views', ext: '.ect' }).render);
 app.set('view engine', 'ect');
 
-console.log(crypto.createHash('sha256').update('hogehoge'+crypt_salt).digest('hex'));
+// console.log(crypto.createHash('sha256').update('hogehoge'+crypt_salt).digest('hex'));
 
 var service;
 var users;
@@ -84,15 +84,18 @@ app.post('/admin-service', function(req, res) {
 
 // Service Edit
 app.get("/admin-edit/:_id", function(req, res) {
-    service.findOne({_id: mongo.ObjectID(req.params._id)}, function(err, item) {
-        console.log(item);
-//        res.send(item);
-    });
-});
-
-app.get("/admin-edit/", function(req, res) {
-        console.log("aaaaaaaaaa");
-//        res.send(item);
+    if ( 'new' !== req.params._id )
+    {
+        service.findOne({_id: mongo.ObjectID(req.params._id)}, function(err, item) {
+            console.log(item);
+//            item.pass = decrypto_convert(item.pass);
+            res.render('admin-edit', item);
+        });
+    }
+    else
+    {
+        res.render('admin-edit');
+    }
 });
 
 app.get('/test', function(req, res){
