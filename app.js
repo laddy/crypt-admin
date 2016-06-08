@@ -4,10 +4,11 @@ var mongo      = require('mongodb');
 var crypto     = require('crypto');
 var ECT        = require('ect');
 
-var crypt_salt = 'GYw-HB35AHsTVmKVyJ7Ur6JLhaQHPiWS';
-
 var app     = express();
 var server  = app.listen(3000);
+
+var crypt_salt = 'GYw-HB35AHsTVmKVyJ7Ur6JLhaQHPiWS';
+
 
 function crypto_convert(text)
 {
@@ -76,6 +77,15 @@ app.get('/admin-service/', function(req, res) {
 });
 app.post('/admin-service', function(req, res) {
     console.log(res.body);
+    console.log(res.body.pass);
+    console.log(res.body['pass']);
+    req.body.pass = crypto_convert(res.body.pass);
+    if ( "" !== res.body._id )
+    {
+         res.body._id = mongo.ObjectID(res.body._id);
+         console.log(res.body._id);
+         service.update(res.body);
+    }
     // Save Mongo
     service.insert(req.body);
     res.redirect('/admin-service');
