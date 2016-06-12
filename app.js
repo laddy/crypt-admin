@@ -3,6 +3,9 @@ var bodyParser = require('body-parser');
 var mongo      = require('mongodb');
 var crypto     = require('crypto');
 var ECT        = require('ect');
+var session    = require('express-session');
+// var MongoStore = require('connect-mongo')(session);
+
 
 var app     = express();
 var server  = app.listen(3000);
@@ -31,33 +34,21 @@ function decrypto_convert(text)
 
 }
 
-// Login Check
-var loginCheck = function(req, res, next) {
-    if(req.session.user){
-      next();
-    }else{
-      res.redirect('/');
-    }
-};
-
-
 // Session 
 /*
-app.use(express.cookieParser());
-app.use(express.session({
+app.use(session({
     secret: 'secret',
     store: new MongoStore({
-        db: 'session',
-        host: 'localhost',
+        db: 'crypt-admin',
+        host: 'laddy:laddymongo@ds030829.mlab.com:30829',
         clear_interval: 60 * 60
     }),
     cookie: {
-        httpOnly: false,
+        httpOnly: true,
         maxAge: new Date(Date.now() + 60 * 60 * 1000)
     }
-})); //追加
+}));
 */
-
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.engine('ect', ECT({ watch: true, root: __dirname + '/views', ext: '.ect' }).render);
@@ -82,7 +73,7 @@ app.get('/', function(req, res) {
 });
 app.post('/', function(req, res) {
     console.log(req.body);
-    res.render('index', {title1 : 'post', hoge: req.body.test});
+    res.render('index');
 });
 
 
@@ -112,18 +103,24 @@ app.get('/admin-service/', function(req, res) {
         res.render('admin-service', {list: items});
     });
 });
+// Save Service Data
 app.post('/admin-service', function(req, res) {
-    console.log(req.body['pass']);
+    console.log(req.body);
 
     req.body.pass = crypto_convert(req.body.pass);
     if ( "" !== req.body._id )
     {
-         req.body._id = mongo.ObjectID(req.body._id);
-         console.log(req.body._id);
-         service.update(req.body);
+        console.log('update');
+        req.body._id = mongo.ObjectID(req.body._id);
+        console.log('mongoID: ' + req.body._id);
+        service.update({'_id' : req.body._id}, req.body);
     }
-    // Save Mongo
-    service.insert(req.body);
+    else {
+        // Save Mongo
+        console.log('insert');
+        req.body._id = null;
+        service.insert(req.body);
+    }
     res.redirect('/admin-service');
 });
 
@@ -133,8 +130,7 @@ app.get("/admin-edit/:_id", function(req, res) {
     if ( 'new' !== req.params._id )
     {
         service.findOne({_id: mongo.ObjectID(req.params._id)}, function(err, item) {
-            console.log(item);
-//            item.pass = decrypto_convert(item.pass);
+            item.pass = decrypto_convert(item.pass);
             res.render('admin-edit', item);
         });
     }
