@@ -20,11 +20,44 @@ function crypto_convert(text)
 
 function decrypto_convert(text)
 {
-    var decipher  = crypto.createDecipher('aes-256-cbc', 'password');
-    var dec       = decipher.update(text, 'hex', 'utf-8');
-    dec          += decipher.final('utf-8');
-    return dec;
+    try {
+        var decipher  = crypto.createDecipher('aes-256-cbc', 'password');
+        var dec       = decipher.update(text, 'hex', 'utf-8');
+        dec          += decipher.final('utf-8');
+        return dec;        
+    } catch (error) {
+        return text;
+    }
+
 }
+
+// Login Check
+var loginCheck = function(req, res, next) {
+    if(req.session.user){
+      next();
+    }else{
+      res.redirect('/');
+    }
+};
+
+
+// Session 
+/*
+app.use(express.cookieParser());
+app.use(express.session({
+    secret: 'secret',
+    store: new MongoStore({
+        db: 'session',
+        host: 'localhost',
+        clear_interval: 60 * 60
+    }),
+    cookie: {
+        httpOnly: false,
+        maxAge: new Date(Date.now() + 60 * 60 * 1000)
+    }
+})); //追加
+*/
+
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.engine('ect', ECT({ watch: true, root: __dirname + '/views', ext: '.ect' }).render);
@@ -37,13 +70,11 @@ var users;
 mongo.MongoClient.connect("mongodb://laddy:laddymongo@ds030829.mlab.com:30829/crypt-admin", function(err, database) {
     users   = database.collection("users");
     service = database.collection("service");
+    console.log('in connect');
 });
 
 
 // console.log(decrypto_convert(crypto_convert('test')));
-
-
-
 
 // ログイン画面表示
 app.get('/', function(req, res) {
@@ -69,22 +100,27 @@ app.get('/admin-user', function(req, res) {
     res.render('admin-user');
 });
 
-// サービス登録
+/*
+ * Admin Area
+ */
+// 全サービス表示
 app.get('/admin-service/', function(req, res) {
     service.find().toArray(function(err, items) {
+        items.forEach(function(element) {
+            element.pass = decrypto_convert(element.pass);
+        }, this);
         res.render('admin-service', {list: items});
     });
 });
 app.post('/admin-service', function(req, res) {
-    console.log(res.body);
-    console.log(res.body.pass);
-    console.log(res.body['pass']);
-    req.body.pass = crypto_convert(res.body.pass);
-    if ( "" !== res.body._id )
+    console.log(req.body['pass']);
+
+    req.body.pass = crypto_convert(req.body.pass);
+    if ( "" !== req.body._id )
     {
-         res.body._id = mongo.ObjectID(res.body._id);
-         console.log(res.body._id);
-         service.update(res.body);
+         req.body._id = mongo.ObjectID(req.body._id);
+         console.log(req.body._id);
+         service.update(req.body);
     }
     // Save Mongo
     service.insert(req.body);
