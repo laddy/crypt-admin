@@ -54,25 +54,28 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.engine('ect', ECT({ watch: true, root: __dirname + '/views', ext: '.ect' }).render);
 app.set('view engine', 'ect');
 
-// console.log(crypto.createHash('sha256').update('hogehoge'+crypt_salt).digest('hex'));
+console.log(crypto.createHash('sha256').update('admin'+crypt_salt).digest('hex'));
+// console.log(decrypto_convert(crypto_convert('admin')));
 
 var service;
 var users;
 mongo.MongoClient.connect("mongodb://laddy:laddymongo@ds030829.mlab.com:30829/crypt-admin", function(err, database) {
     users   = database.collection("users");
     service = database.collection("service");
+    user    = database.collection("user");
     console.log('in connect');
 });
 
 
-// console.log(decrypto_convert(crypto_convert('test')));
 
 // ログイン画面表示
 app.get('/', function(req, res) {
     res.render('index', {title1 : 'express test title1'});
 });
 app.post('/', function(req, res) {
-    console.log(req.body);
+//    console.log(req.body);
+    var usr = user.find({login : req.body.userid, password : crypto.createHash('sha256').update(req.body.password + crypt_salt).digest('hex')});
+    console.log(usr);
     res.render('index');
 });
 
@@ -90,6 +93,7 @@ app.get('/acclist', function(req, res) {
 app.get('/admin-user', function(req, res) {
     res.render('admin-user');
 });
+
 
 /*
  * Admin Area
