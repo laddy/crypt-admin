@@ -1,10 +1,13 @@
-var express    = require('express');
+var express      = require('express');
+var mongo        = require('mongodb');
+var crypto       = require('crypto');
+var ECT          = require('ect');
+
+var session      = require('express-session');
+var mongoStore   = require('connect-mongo')(session);
+var cookieParser = require('cookie-parser')
+
 var bodyParser = require('body-parser');
-var mongo      = require('mongodb');
-var crypto     = require('crypto');
-var ECT        = require('ect');
-var session    = require('express-session');
-// var MongoStore = require('connect-mongo')(session);
 
 
 var app     = express();
@@ -34,21 +37,19 @@ function decrypto_convert(text)
 
 }
 
-// Session 
-/*
-app.use(session({
-    secret: 'secret',
-    store: new MongoStore({
-        db: 'crypt-admin',
-        host: 'laddy:laddymongo@ds030829.mlab.com:30829',
-        clear_interval: 60 * 60
+app.use(cookieParser());
+app.use(session({         // cookieに書き込むsessionの仕様を定める
+    secret: 'secret',               // 符号化。改ざんを防ぐ
+    store: new mongoStore({
+        db: 'session',
+        url: 'mongodb://laddy:laddymongo@ds030829.mlab.com:30829/crypt-admin',
+        clear_interval: 60 * 60     // mongodbに登録されたsession一覧を見て、expireしている物を消す、ということをする周期
     }),
-    cookie: {
-        httpOnly: true,
-        maxAge: new Date(Date.now() + 60 * 60 * 1000)
+    cookie: { //cookieのデフォルト内容
+        httpOnly: false,
+        maxAge: 60 * 60 * 1000//1 hour. ここを指定しないと、ブラウザデフォルト(ブラウザを終了したらクッキーが消滅する)になる
     }
 }));
-*/
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.engine('ect', ECT({ watch: true, root: __dirname + '/views', ext: '.ect' }).render);
@@ -59,10 +60,10 @@ console.log(crypto.createHash('sha256').update('admin'+crypt_salt).digest('hex')
 
 var service;
 var users;
+
 mongo.MongoClient.connect("mongodb://laddy:laddymongo@ds030829.mlab.com:30829/crypt-admin", function(err, database) {
     users   = database.collection("users");
     service = database.collection("service");
-    user    = database.collection("user");
     console.log('in connect');
 });
 
@@ -70,13 +71,36 @@ mongo.MongoClient.connect("mongodb://laddy:laddymongo@ds030829.mlab.com:30829/cr
 
 // ログイン画面表示
 app.get('/', function(req, res) {
+    console.log(req.session.id);
     res.render('index', {title1 : 'express test title1'});
 });
 app.post('/', function(req, res) {
-//    console.log(req.body);
-    var usr = user.find({login : req.body.userid, password : crypto.createHash('sha256').update(req.body.password + crypt_salt).digest('hex')});
-    console.log(usr);
-    res.render('index');
+    users.findOne({
+            login : req.body.userid,
+            password : crypto.createHash('sha256').update(req.body.password + crypt_salt).digest('hex')
+        },
+        function (err, authuser) {
+            if ( !authuser ) {
+                res.render('index');
+            }
+            else if ( 1 < Object.keys(authuser).length ) {
+                req.session.user = {
+                    id   : authuser.login,
+                    name : authuser.name,
+                    pwd  : authuser.password,
+                };
+                console.log('in login');
+
+                // Admin go all service page
+                if ( 'admin' == authuser.login ) {
+                    res.redirect('admin-service');
+                }
+                else {
+                    res.redirect('acclist');
+                }
+            }
+        }
+    );
 });
 
 
@@ -91,7 +115,12 @@ app.get('/acclist', function(req, res) {
 
 // ユーザ登録
 app.get('/admin-user', function(req, res) {
-    res.render('admin-user');
+    if ( 'admin' == req.session.id ) {
+        res.render('admin-user');
+    }
+    else {
+        res.render('acclist');
+    }
 });
 
 
@@ -100,6 +129,10 @@ app.get('/admin-user', function(req, res) {
  */
 // 全サービス表示
 app.get('/admin-service/', function(req, res) {
+    if ( 'admin' != req.session.id ) {
+        res.render('acclist');
+    }
+
     service.find().toArray(function(err, items) {
         items.forEach(function(element) {
             element.pass = decrypto_convert(element.pass);
@@ -109,7 +142,9 @@ app.get('/admin-service/', function(req, res) {
 });
 // Save Service Data
 app.post('/admin-service', function(req, res) {
-    console.log(req.body);
+    if ( 'admin' != req.session.id ) {
+        res.render('acclist');
+    }
 
     req.body.pass = crypto_convert(req.body.pass);
     if ( "" !== req.body._id )
@@ -131,6 +166,9 @@ app.post('/admin-service', function(req, res) {
 
 // Service Edit
 app.get("/admin-edit/:_id", function(req, res) {
+    if ( 'admin' != req.session.id ) {
+        res.render('acclist');
+    }
     if ( 'new' !== req.params._id )
     {
         service.findOne({_id: mongo.ObjectID(req.params._id)}, function(err, item) {

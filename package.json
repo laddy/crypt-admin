@@ -11,11 +11,15 @@
   "dependencies": {
     "body-parser": "^1.15.1",
     "browserify": "^13.0.1",
+    "connect-mongo": "^1.2.0",
+    "cookie-parser": "^1.4.3",
+    "cookieparser": "^0.1.0",
     "crypt": "0.0.1",
     "ect": "^0.5.9",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "jquery": "^2.2.3",
-    "mongodb": "^2.1.18"
+    "mongodb": "^2.1.18",
+    "mongoose": "^4.5.0"
   }
 }
