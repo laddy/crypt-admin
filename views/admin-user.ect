@@ -2,44 +2,22 @@
 
 <div class="container">
 
-<h1>{{UserID}}のリスト</h1>
+    <h1>ユーザリスト</h1>
 
-<table class="table table-striped">
-<tr>
-    <th>#</th>
-    <th>Service</th>
-    <th>URL</th>
-    <th>ID</th>
-    <th>Pass</th>
-</tr>
-<tr>
-    <td>1</td>
-    <td>Twitter</td>
-    <td>https://twitter.jp</td>
-    <td>Hoge</td>
-    <td>aaaaaa</td>
-</tr>
-<tr>
-    <td>2</td>
-    <td>Twitter</td>
-    <td>https://twitter.jp</td>
-    <td>Hoge</td>
-    <td>aaaaaa</td>
-</tr>
-<tr>
-    <td>3</td>
-    <td>Twitter</td>
-    <td>https://twitter.jp</td>
-    <td>Hoge</td>
-    <td>aaaaaa</td>
-</tr>
-<tr>
-    <td>4</td>
-    <td>Twitter</td>
-    <td>https://twitter.jp</td>
-    <td>Hoge</td>
-    <td>aaaaaa</td>
-</tr>
-</table>
+    <table class="table table-striped">
+    <tr>
+        <th>#</th>
+        <th>UserID</th>
+    </tr>
+    <% for user in @user_list : %>
+    <tr>
+        <td>
+          <a href="/admin-edit/<%- user.id %>">Edit</a>
+        </td>
+        <td><%- user.id %></td>
+        <td><a href="<%- item.url %>">Link</a></td>
+    </tr>
+    <% end %>
+    </table>
 
 </div>

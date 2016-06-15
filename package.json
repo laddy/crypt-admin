@@ -17,6 +17,7 @@
     "crypt": "0.0.1",
     "ect": "^0.5.9",
     "express": "^4.13.4",
+    "express-router": "0.0.1",
     "express-session": "^1.13.0",
     "jquery": "^2.2.3",
     "mongodb": "^2.1.18",

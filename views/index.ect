@@ -25,11 +25,22 @@ h4 {border:0 solid #fff;border-bottom-width:1px;padding-bottom:10px;text-align: 
 <body>
 
 
+
+
 <form method="post" action="/">
 
 <div class="container">
+
     <div class="row">
         <div class="col-md-offset-5 col-md-3">
+            <% if undefined != @err : %>
+            <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>
+            <%- @err %>
+            </div>
+            <% end: %>
+            
             <div class="form-login">
             <h4>Welcome Crypt-Admin.</h4>
             <input type="text" id="userName" class="form-control input-sm chat-input" name="userid" placeholder="username" />
